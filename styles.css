@@ -96,17 +96,30 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
 .header {
   position: fixed;
   top: clamp(16px, 2.4vh, 28px);
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: clamp(18px, 2.8vw, 28px);
   width: calc(100% - 2 * clamp(14px, 3vw, 32px));
   max-width: 720px;
-  margin: 0 auto;
   z-index: 100;
   pointer-events: auto;
+  filter: none !important;
+  animation: headerEntrance 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes headerEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .logo-btn {
@@ -406,8 +419,14 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
   100% { transform: scaleY(0.4); opacity: 0.4; }
 }
 
+/* ---------- Global hidden helper ---------- */
+[hidden] {
+  display: none !important;
+}
+
 /* ---------- Mobile menu ---------- */
 .overlay {
+  display: none;
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.62);
@@ -416,8 +435,12 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
   z-index: 100;
   animation: overlayIn 0.28s ease forwards;
 }
+.overlay:not([hidden]) {
+  display: block;
+}
 
 .mobile-menu {
+  display: none;
   position: fixed;
   top: calc(clamp(16px, 2.4vh, 28px) + clamp(40px, 4.4vw, 46px) + 12px);
   left: 50%;
@@ -425,63 +448,74 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
   width: min(320px, 88vw);
   background: #fff;
   border-radius: 28px;
-  padding: 18px 16px 16px;
+  padding: 24px 20px 20px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
   z-index: 101;
-  display: flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  gap: 2px;
   animation: menuIn 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.mobile-menu:not([hidden]) {
+  display: flex;
 }
 
 .m-link {
   position: relative;
   color: var(--nav-text);
+  font-family: var(--font-sans);
   font-weight: 500;
-  font-size: 15.5px;
-  padding: 12px 18px;
-  border-radius: 14px;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  opacity: 0.5;
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 12px;
+  text-align: center;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  opacity: 0;
+  justify-content: center;
+  transition: opacity 0.2s ease, background 0.2s ease;
   animation: linkIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  transition: background 0.2s ease, color 0.2s ease;
 }
 .m-link:hover {
-  background: #f5f5f7;
+  opacity: 0.85;
+  background: rgba(0, 0, 0, 0.03);
 }
+.m-link.active {
+  opacity: 1;
+  font-weight: 600;
+  color: #000;
+  background: transparent;
+}
+
 .m-link:nth-child(1) { animation-delay: 0.05s; }
 .m-link:nth-child(2) { animation-delay: 0.1s; }
 .m-link:nth-child(3) { animation-delay: 0.15s; }
 .m-link:nth-child(4) { animation-delay: 0.2s; }
-.m-link.active {
-  background: #f0f0f2;
-  font-weight: 600;
-}
-.m-link.active::after {
-  content: "";
-  display: inline-block;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: #000;
-  box-shadow: -5px 0 0 #000, 5px 0 0 #000;
-  margin-right: 6px;
-  flex-shrink: 0;
-}
 
 .m-signin {
-  margin-top: 8px;
+  width: 100%;
+  margin-top: 10px;
   text-align: center;
   background: var(--pill-dark);
   color: #fff;
-  padding: 14px;
+  padding: 13px 20px;
   border-radius: 999px;
-  font-weight: 600;
+  font-weight: 500;
+  font-size: 15px;
+  box-shadow: var(--nav-shadow);
+  display: block;
+  box-sizing: border-box;
+  transition: background 0.2s ease, transform 0.2s ease;
   opacity: 0;
   animation: linkIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   animation-delay: 0.25s;
+}
+.m-signin:hover {
+  background: #323234;
+  color: #fff;
+  transform: translateY(-1px);
 }
 
 /* =========================================================
@@ -515,11 +549,6 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-18px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.header { animation: slideDown 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
 @keyframes overlayIn {
   from { opacity: 0; }
@@ -540,6 +569,12 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
     opacity: 1 !important;
     transform: none !important;
     filter: none !important;
+  }
+}
+
+@media (min-width: 721px) {
+  .overlay, .mobile-menu {
+    display: none !important;
   }
 }
 
